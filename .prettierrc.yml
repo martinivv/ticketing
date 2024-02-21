@@ -1,0 +1,19 @@
+overrides:
+  - files: "*.sol"
+    options:
+      printWidth: 120
+      tabWidth: 4
+      bracketSpacing: false
+      useTabs: false
+
+  - files: "*.ts"
+    options:
+      parser: typescript
+      printWidth: 120
+      tabWidth: 4
+      semi: false
+      singleQuote: true
+
+  - files: "*.md"
+    options:
+      proseWrap: "always"

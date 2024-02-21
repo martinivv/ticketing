@@ -1,0 +1,35 @@
+{
+  "author": "Martin Ivanov Ivanov",
+  "name": "nft-tickets-marketplace",
+  "description": "Encorp task",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "scripts": {
+    "postinstall": "yarn typechain",
+    "compile": "hardhat compile",
+    "clean": "rimraf ./build ./types/typechain && yarn typechain",
+    "typechain": "hardhat typechain"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
+    "@nomicfoundation/hardhat-ethers": "^3.0.5",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.10",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.4",
+    "@swc/core": "^1.4.2",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.19",
+    "chai": "4.3.7",
+    "ethers": "^6.11.1",
+    "hardhat": "^2.20.1",
+    "hardhat-gas-reporter": "^1.0.10",
+    "rimraf": "^5.0.5",
+    "solidity-coverage": "^0.8.7",
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,10 @@
+# Secrets
+.env
+
+# Folders
+build/
+node_modules/
+types/typechain/
+
+# Files
+# ...
