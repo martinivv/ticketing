@@ -13,7 +13,3 @@ overrides:
       tabWidth: 4
       semi: false
       singleQuote: true
-
-  - files: "*.md"
-    options:
-      proseWrap: "always"
