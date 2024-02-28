@@ -39,7 +39,6 @@ contract Event is EventStorage {
     // Allowed period of executing?
     function withdrawFunds() external payable virtual {
         if (msg.sender != eventCreator) revert Errors.MustBeEventCreator();
-
         bytes4 errorSelector = Errors.WithdrawFailed.selector;
         uint256 withdrawValue;
         assembly {

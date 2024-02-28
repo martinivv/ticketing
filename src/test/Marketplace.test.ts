@@ -1,35 +1,37 @@
+import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { expect } from 'chai'
-import { TransactionResponse, ZeroAddress } from 'ethers'
 import hre from 'hardhat'
-import { fixtures, getCurrentBlock } from '../_helpers/shared-helpers'
+import { fixtures, Test_getSaleDuration, value as ticketPrice } from '../_helpers/shared-helpers'
 
 describe('Marketplace', () => {
     fixtures(['all'])
 
     /* ============================================ INITIALIZATION ============================================ */
 
-    describe('#Initialization', () => {
+    describe('#State-Initialization', () => {
         it('sets standard initial owner', async function () {
             expect(await hre.Marketplace.owner()).to.be.equal(hre.users.deployer.address)
         })
 
-        it('sets standard Beacon address', async function () {
-            expect(await hre.Marketplace.BEACON_()).to.be.equal(hre.EventBeacon.target)
+        it('sets standard beacon address', async function () {
+            expect(await hre.Marketplace.BEACON_()).to.be.equal(hre.EventBeacon.address)
         })
     })
 
     /* ============================================ FUNCTIONALITIES =========================================== */
 
     describe('#Functionalities', () => {
-        let tx: TransactionResponse
+        let createEventTx: TransactionResponse
 
         beforeEach(async function () {
-            const saleStart = (await getCurrentBlock()) + 1
-            tx = await hre.Marketplace.createEvent('URI', 'EVENT', 'EVNT', saleStart, saleStart + 1, this.value)
+            const { saleStart, saleEnd } = await Test_getSaleDuration()
+            this.eventParams = ['URI', 'EVENT', 'EVNT', saleStart, saleEnd, ticketPrice]
+            // @ts-ignore
+            createEventTx = await hre.Marketplace.createEvent(...this.eventParams)
         })
 
-        it('emits an event on *EVENT* creation', async function () {
-            await expect(tx).to.emit(hre.Marketplace, 'ProxyDeployed')
+        it('emits an event on every added event', async function () {
+            await expect(createEventTx).to.emit(hre.Marketplace, 'ProxyDeployed')
         })
 
         it('saves the proxy instance', async function () {
@@ -37,23 +39,24 @@ describe('Marketplace', () => {
         })
 
         it('updates the base implementation', async function () {
-            await hre.Marketplace.updateImplementation(hre.RNGService.target) // Address with code size > 0
-            expect(await hre.EventBeacon.implementation()).to.equal(hre.RNGService.target)
+            // For the testing purpose — an address with code size > 0
+            await hre.Marketplace.updateImplementation(hre.RNGService.address)
+            expect(await hre.EventBeacon.implementation()).to.equal(hre.RNGService.address)
         })
     })
 
     /* ================================================ ATTACK ================================================ */
 
-    describe('#Attack-Generalized', () => {
+    describe('#Attack', () => {
         it('reverts if a user tries to setup the event structure', async function () {
             await expect(
-                hre.Marketplace.connect(hre.users.userOne).setupEvents(ZeroAddress)
+                hre.Marketplace.connect(hre.users.userOne).setupEvents(hre.ethers.constants.AddressZero)
             ).to.be.revertedWithCustomError(hre.Marketplace, 'OwnableUnauthorizedAccount')
         })
 
         it('reverts if a user tries to update the base implementation', async function () {
             await expect(
-                hre.Marketplace.connect(hre.users.userOne).updateImplementation(ZeroAddress)
+                hre.Marketplace.connect(hre.users.userOne).updateImplementation(hre.ethers.constants.AddressZero)
             ).to.be.revertedWithCustomError(hre.Marketplace, 'OwnableUnauthorizedAccount')
         })
 
@@ -71,47 +74,46 @@ describe('Marketplace', () => {
         })
     })
 
-    describe('#Attack_CreateEvent-Input', () => {
-        let currentBlock: number
-
+    describe('#Attack-CreateEvent', () => {
         beforeEach(async function () {
-            currentBlock = await getCurrentBlock()
-            this.testArgs = ['URI', 'EVENT', 'EVNT', currentBlock + 1, currentBlock + 2, this.value]
+            const { saleStart, saleEnd } = await Test_getSaleDuration()
+            this.eventParams = ['URI', 'EVENT', 'EVNT', saleStart, saleEnd, ticketPrice]
         })
 
         afterEach(async function () {
-            await expect(hre.Marketplace.createEvent(...this.testArgs)).to.be.revertedWithCustomError(
+            // @ts-ignore
+            await expect(hre.Marketplace.createEvent(...this.eventParams)).to.be.revertedWithCustomError(
                 hre.Marketplace,
                 'InvalidIO'
             )
         })
 
-        it('reverts if an event identifier is not supplied', function () {
-            this.testArgs[0] = ''
+        it('reverts if the event identifier is not supplied', function () {
+            this.eventParams[0] = ''
         })
 
-        it('reverts if a name is not given', function () {
-            this.testArgs[1] = ''
+        it('reverts if the name is not given', function () {
+            this.eventParams[1] = ''
         })
 
-        it('reverts if a symbol is not set', function () {
-            this.testArgs[2] = ''
+        it('reverts if the symbol is not set', function () {
+            this.eventParams[2] = ''
         })
 
-        it('reverts if the `saleStart` is in the past', function () {
-            this.testArgs[3] = currentBlock
+        it('reverts if the `saleStart` is in the past', async function () {
+            this.eventParams[3] -= 1n
         })
 
-        it('reverts if the `saleEnd` is in the past', function () {
-            this.testArgs[4] = currentBlock
+        it('reverts if the `saleEnd` is in the past', async function () {
+            this.eventParams[4] -= 1n
         })
 
-        it('reverts if the `saleEnd` is identical to the `saleStart`', function () {
-            this.testArgs[4] = currentBlock + 1
+        it('reverts if the `saleEnd` is identical to the `saleStart`', async function () {
+            this.eventParams[4] = this.eventParams[3]
         })
 
         it('reverts if the ticket is free', function () {
-            this.testArgs[5] = 0
+            this.eventParams[5] = 0
         })
     })
 })

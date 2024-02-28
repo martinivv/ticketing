@@ -1,24 +1,18 @@
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
-import { Addressable } from 'ethers'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { extendEnvironment } from 'hardhat/config'
 import 'hardhat/types/runtime'
 import { Event, EventBeacon, Marketplace, RNGService } from './typechain'
 
 /* ============================================= AUGMENTATION ============================================= */
 
-// Enables easier testing
+// For an easier testing
 extendEnvironment(async function (hre) {
     hre.users = await hre.ethers.getNamedSigners()
 })
 
 declare module 'hardhat/types/runtime' {
     interface HardhatRuntimeEnvironment {
-        users: Record<string, HardhatEthersSigner>
-        dataOnDeployment: {
-            rngServiceAddr: string | Addressable
-            eventImplementationAddr: string | Addressable
-            marketplaceAddr: string | Addressable
-        }
+        users: Record<string, SignerWithAddress>
         Marketplace: Marketplace
         Event: Event
         EventBeacon: EventBeacon

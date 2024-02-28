@@ -1,9 +1,6 @@
 import hre from 'hardhat'
-import { getCurrentBlock, parseAmount } from './_helpers/shared-helpers'
+import { Test_getSaleDuration, value } from './_helpers/shared-helpers'
 import { Event } from './_helpers/typechain'
-
-// Preconditions 👇
-const value = parseAmount('1', 18)
 
 async function main() {
     console.log(`\n${Array(60).join('=')}\n`)
@@ -11,8 +8,8 @@ async function main() {
     await hre.deployments.run('all')
     console.log('>>> The marketplace has been successfully deployed')
 
-    const saleStartBlock = (await getCurrentBlock()) + 1
-    await hre.Marketplace.createEvent('URI', 'EVENT', 'EVNT', saleStartBlock, saleStartBlock + 2, value)
+    const { saleStart, saleEnd } = await Test_getSaleDuration()
+    await hre.Marketplace.createEvent('URI', 'EVENT', 'EVNT', saleStart, saleEnd + 1n, value)
     console.log('>>> An event has been created')
 
     const proxy = hre.Event.attach((await hre.Marketplace.getAllProxies())[0]) as Event

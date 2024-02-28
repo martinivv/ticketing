@@ -2,9 +2,11 @@ import type { HardhatUserConfig } from 'hardhat/types'
 
 /* ================================================ PLUGINS =============================================== */
 
-import '@nomicfoundation/hardhat-toolbox'
+import '@nomicfoundation/hardhat-chai-matchers'
 import '@nomiclabs/hardhat-ethers'
+import '@typechain/hardhat'
 import 'hardhat-deploy'
+import 'hardhat-deploy-ethers'
 
 /* ============================================= AUGMENTATION ============================================= */
 
@@ -22,7 +24,7 @@ export default <HardhatUserConfig>{
         cache: './build/cache',
     },
     typechain: {
-        target: 'ethers-v6',
+        target: 'ethers-v5',
         outDir: './src/_helpers/typechain',
     },
     namedAccounts: {

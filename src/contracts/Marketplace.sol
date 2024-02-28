@@ -55,8 +55,6 @@ contract Marketplace is Ownable {
 
     /* ================================================= VIEW ================================================= */
 
-    // `getCurrentImpl`?
-
     function getAllProxies() public view returns (address[] memory res) {
         uint256 len = _deployedTicketProxies.length();
         res = new address[](len);
