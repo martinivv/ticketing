@@ -11,13 +11,15 @@ contract Event is EventStorage {
         _disableInitializers();
     }
 
-    /// @notice Buying functionality with an option for storing on-chain TICKET metadata
+    /// @notice Buying functionality on a fixed sale period
+    /// @dev Including an option for storing on-chain TICKET metadata
     function buyTicket() external payable virtual override onActiveSale {
         if (msg.value < ticketPrice) revert Errors.InsufficientBuyValue();
         _buyTicket();
     }
 
-    /// @notice After the end of the event, makes a request to `RNGService`/DON
+    /// @notice After the end of the sale period, makes a request for
+    /// a fair and verifiable random number
     function requestEventWinner() external virtual override afterActiveSale {
         RNG_SERVICE_.fundVrfConsumer();
         RNG_SERVICE_.requestRandomNumber("applyRewarding(uint256)");
@@ -34,6 +36,7 @@ contract Event is EventStorage {
 
     /* ========================================== EVENT CREATOR ========================================= */
 
+    /// @notice A method that the event creator can use to withdraw the collected funds
     /// @dev The intend of using assembly here is to skip the annoying memory copy on `.call()`
     /// @dev ::suggestion Allowed period of executing?
     function withdrawFunds() external payable virtual nonReentrant {

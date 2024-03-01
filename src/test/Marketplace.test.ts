@@ -14,7 +14,7 @@ describe('Marketplace', () => {
         })
 
         it('sets standard beacon address', async function () {
-            expect(await hre.Marketplace.BEACON_()).to.be.equal(hre.EventBeacon.address)
+            expect(await hre.Marketplace.beaconAddr()).to.be.equal(hre.EventBeacon.address)
         })
     })
 
@@ -35,7 +35,7 @@ describe('Marketplace', () => {
         })
 
         it('saves the proxy instance', async function () {
-            expect(await hre.Marketplace.getAllProxies()).to.not.be.empty
+            expect(await hre.Marketplace.getAllEvents()).to.not.be.empty
         })
     })
 

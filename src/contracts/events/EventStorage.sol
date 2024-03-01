@@ -7,19 +7,19 @@ import {IEvent} from "./IEvent.sol";
 import {RNGService} from "./RNGService.sol";
 import {Errors, Events} from "../shared/Monitoring.sol";
 
-/// @notice @title EventStorage provides the storage layout saved on the proxy with some abstract-controlling methods
+/// @dev @title EventStorage provides the storage layout saved on the proxy with some abstract-controlling methods
 abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUpgradeable, IEvent {
     RNGService public immutable RNG_SERVICE_;
 
-    /// @notice Off-chain source of data
+    /// @notice Source of the off-chain stored data (e.g., IPFS)
     string public eventData;
+    /// @notice 👇 are variables related to the current event
+    /// @dev ::suggestion Consider packing the storage variables in fewer storage slots; by using smaller sizes, DIFFERENT type
     address public eventCreator;
     uint256 public saleStart;
     uint256 public saleEnd;
     uint256 public ticketPrice;
-
     uint256 public nextTicketId;
-    // Consider packing the storage variables in fewer storage slots; by using smaller sizes, DIFFERENT type
 
     /* =============================================== ABSTRACT =============================================== */
 
@@ -43,7 +43,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
         RNG_SERVICE_ = RNGService(_rngService);
     }
 
-    /// @notice Sets the setup of the proxy state
+    /// @notice Setups the event
     /// @dev `initializer` modifier — prevents the proxy state to be reinitialized
     /// @dev By using `_init()` we're preventing some potential inheritance-chain related
     /// problems in OZ's implementations
@@ -66,7 +66,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
         ticketPrice = _ticketPrice;
     }
 
-    /// @dev Consider implementing logic for storing on-chain TICKET metadata
+    /// @dev ::suggestion Consider implementing logic for storing on-chain ticket metadata
     function _buyTicket() internal {
         _mint(msg.sender, nextTicketId);
         // _setTokenURI(ticketId, "");
@@ -74,9 +74,10 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
         nextTicketId++;
     }
 
-    function _isActive() internal view returns (bool res) {
+    /// @notice Checks if the event is currently active
+    function _isActive() internal view returns (bool out) {
         uint256 currentBlock = block.number;
-        res = currentBlock >= saleStart && currentBlock <= saleEnd;
+        out = currentBlock >= saleStart && currentBlock <= saleEnd;
     }
 
     /// @dev This empty reserved space is put in place to allow future versions to add new

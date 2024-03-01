@@ -11,16 +11,16 @@ import {Errors, Events} from "../shared/Monitoring.sol";
 contract RNGService is VRFV2WrapperConsumerBase, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    // *Hardcoded values — Chainlink VRF*
+    /// @notice Chainlink VRF related variables
     uint32 private constant CALLBACK_GAS_LIMIT = 100_000;
     uint16 private constant REQ_CONFIRMATIONS = 3;
     uint32 private constant REQ_WORDS = 1;
-
     address public immutable linkTokenAddr;
 
     /* ::suggestion Place for state controllers, parameters, which can then be used somewhere else.
     Records of: `requestId => randomNumber`, `uint256 => callbackSignature`, etc. */
 
+    /// @notice Request-Response controllers
     mapping(uint256 => address) private _requests;
     mapping(uint256 => string) private _callbacks;
 
@@ -34,16 +34,20 @@ contract RNGService is VRFV2WrapperConsumerBase, ReentrancyGuard {
         linkTokenAddr = linkTokenAddr_;
     }
 
+    /// @notice Enables receiving funds
     receive() external payable {}
 
+    /// @notice Funds the Chainlink VRF request
     /// @dev ::suggestion Event monitoring?
     function fundVrfConsumer() external {
         uint256 fee = 0.25 ether;
         IERC20(linkTokenAddr).safeTransferFrom(msg.sender, address(this), fee);
     }
 
+    /// @notice Makes a Chainlink VRF request
     /// @dev Re-entering may cause inaccuracies
-    /// @dev ::suggestion Consider implementing a more robust RNG process — for example, by using different third-party oracle providers
+    /// @dev ::suggestion Consider implementing a more robust RNG process — e.g.,
+    /// by using different third-party oracle providers
     function requestRandomNumber(string calldata _callbackSignature) external nonReentrant {
         uint256 requestId = requestRandomness(CALLBACK_GAS_LIMIT, REQ_CONFIRMATIONS, REQ_WORDS);
         _requests[requestId] = msg.sender;
@@ -52,6 +56,7 @@ contract RNGService is VRFV2WrapperConsumerBase, ReentrancyGuard {
 
     /* =============================================== RESPONSES ============================================== */
 
+    /// @notice Called by the Chainlink oracle service with the generated randomness
     function fulfillRandomWords(uint256 _requestId, uint256[] memory _randomWords) internal override {
         (bool ok, ) = _requests[_requestId].call(abi.encodeWithSignature(_callbacks[_requestId], _randomWords[0]));
         if (!ok) revert Errors.RandomnessNotApplied();

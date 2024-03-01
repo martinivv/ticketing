@@ -12,7 +12,7 @@ async function script() {
     await hre.Marketplace.createEvent('URI', 'EVENT', 'EVNT', saleStart, saleEnd + 1n, value)
     console.log('>>> An event has been created')
 
-    const proxy = hre.Event.attach((await hre.Marketplace.getAllProxies())[0]) as Event
+    const proxy = hre.Event.attach((await hre.Marketplace.getAllEvents())[0]) as Event
     await proxy.connect(hre.users.userOne).buyTicket({ value })
     console.log('>>> A user has purchased a ticket')
 

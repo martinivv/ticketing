@@ -15,7 +15,7 @@ describe('Event', () => {
         this.eventParams = ['URI', 'EVENT', 'EVNT', saleStart, saleEnd, ticketPrice]
         // @ts-ignore
         await hre.Marketplace.createEvent(...this.eventParams)
-        this.proxy = hre.Event.attach((await hre.Marketplace.getAllProxies())[0])
+        this.proxy = hre.Event.attach((await hre.Marketplace.getAllEvents())[0])
     })
 
     /* ========================================= STATE&FUNCTIONALITIES ======================================== */
@@ -160,7 +160,7 @@ describe('Event', () => {
             this.eventParams[4] += 3n
             // @ts-ignore
             await hre.Marketplace.createEvent(...this.eventParams)
-            const proxy = hre.Event.attach((await hre.Marketplace.getAllProxies())[1])
+            const proxy = hre.Event.attach((await hre.Marketplace.getAllEvents())[1])
             await expect(proxy.buyTicket()).to.be.revertedWithCustomError(proxy, 'SaleNotActive')
         })
 
