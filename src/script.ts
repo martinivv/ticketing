@@ -2,7 +2,7 @@ import hre from 'hardhat'
 import { Test_getSaleDuration, value } from './_helpers/shared-helpers'
 import { Event } from './_helpers/typechain'
 
-async function main() {
+async function script() {
     console.log(`\n${Array(60).join('=')}\n`)
 
     await hre.deployments.run('all')
@@ -25,7 +25,7 @@ async function main() {
     console.log(`\n${Array(60).join('=')}\n`)
 }
 
-main().catch((e) => {
+script().catch((e) => {
     console.error(e)
     process.exitCode = 1
 })

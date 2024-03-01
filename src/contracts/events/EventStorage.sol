@@ -19,7 +19,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
     uint256 public ticketPrice;
 
     uint256 public ticketId;
-    // Consider packing the storage variables in fewer storage slots
+    // Consider packing the storage variables in fewer storage slots; by using smaller sizes, DIFFERENT type
 
     /* =============================================== ABSTRACT =============================================== */
 
@@ -39,7 +39,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
     }
 
     /// @dev Setting immutable variables in an upgradeable contract is safe and can lead to significant gas savings
-    constructor(address _rngService) {
+    constructor(address payable _rngService) {
         RNG_SERVICE_ = RNGService(_rngService);
     }
 

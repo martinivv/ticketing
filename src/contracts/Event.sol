@@ -7,7 +7,7 @@ import {Errors, Events} from "./shared/Monitoring.sol";
 /// @notice @title Event represents every unique UPGRADEABLE event as part of the NFT marketplace
 contract Event is EventStorage {
     /// @dev `_disableInitializers()` — prevents the proxied state of being reinitialized
-    constructor(address _rngService) EventStorage(_rngService) {
+    constructor(address payable _rngService) EventStorage(_rngService) {
         _disableInitializers();
     }
 
@@ -25,7 +25,6 @@ contract Event is EventStorage {
     }
 
     /// @notice Applies the rewarding *mechanism*
-    /// @dev This method can be only called by `RNGService`
     function applyRewarding(uint256 _randomNumber) external virtual onlyRNGService {
         uint256 ticketIdWinner = _randomNumber % ticketId;
         address eventWinner = ownerOf(ticketIdWinner);
@@ -36,7 +35,7 @@ contract Event is EventStorage {
     /* ========================================== EVENT CREATOR ========================================= */
 
     /// @dev The intend of using assembly here is to skip the annoying memory copy on `.call()`
-    // Allowed period of executing?
+    /// @dev ::suggestion Allowed period of executing?
     function withdrawFunds() external payable virtual {
         if (msg.sender != eventCreator) revert Errors.MustBeEventCreator();
         bytes4 errorSelector = Errors.WithdrawFailed.selector;

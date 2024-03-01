@@ -3,7 +3,7 @@ import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { mine } from '@nomicfoundation/hardhat-network-helpers'
 import { expect } from 'chai'
 import hre from 'hardhat'
-import { fixtures, Test_getSaleDuration, value as ticketPrice } from '../_helpers/shared-helpers'
+import { Test_getSaleDuration, fixtures, value as ticketPrice } from '../_helpers/shared-helpers'
 import { Event, Event__factory, RNGService } from '../_helpers/typechain'
 
 describe('Event', () => {
@@ -92,6 +92,19 @@ describe('Event', () => {
             it('emits event on every request for an event winner', async function () {
                 await expect(EVENT_MOCK.requestEventWinner()).to.emit(EVENT_MOCK, 'EventWinnerRequested')
             })
+        })
+
+        describe('#ApplyRewarding', () => {
+            it('emits event on every reward applying', async function () {
+                const signer = await hre.ethers.getImpersonatedSigner(hre.RNGService.address)
+                await hre.users.deployer.sendTransaction({
+                    to: signer.address,
+                    value: hre.ethers.utils.parseEther('1'),
+                })
+                await expect(await this.proxy.connect(signer).applyRewarding(12)).to.emit(this.proxy, 'EventWinner')
+            })
+
+            /* ... */ // The rest of the tests
         })
 
         describe('#WithdrawFunds', () => {

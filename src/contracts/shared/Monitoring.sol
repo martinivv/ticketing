@@ -10,7 +10,7 @@ library Events {
     event BaseImplementationChanged(address indexed previous, address indexed new_);
 }
 
-/// @dev Consider creating more robust error naming if your project's style requires it
+/// @dev ::sugestion Consider creating more robust error naming if your project's style requires it
 library Errors {
     error InvalidIO();
     error SaleNotActive();

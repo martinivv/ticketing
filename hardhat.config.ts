@@ -3,7 +3,6 @@ import type { HardhatUserConfig } from 'hardhat/types'
 /* ================================================ PLUGINS =============================================== */
 
 import '@nomicfoundation/hardhat-chai-matchers'
-import '@nomiclabs/hardhat-ethers'
 import '@typechain/hardhat'
 import 'hardhat-deploy'
 import 'hardhat-deploy-ethers'
