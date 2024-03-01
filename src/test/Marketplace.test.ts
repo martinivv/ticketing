@@ -70,7 +70,7 @@ describe('Marketplace', () => {
             )
         })
 
-        it('reverts if the event identifier is not supplied', function () {
+        it('reverts if the event data is not supplied', function () {
             this.eventParams[0] = ''
         })
 
@@ -94,7 +94,7 @@ describe('Marketplace', () => {
             this.eventParams[4] = this.eventParams[3]
         })
 
-        it('reverts if the ticket is free', function () {
+        it('reverts if the ticket price is set to 0', function () {
             this.eventParams[5] = 0
         })
     })

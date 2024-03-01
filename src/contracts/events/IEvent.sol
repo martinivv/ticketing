@@ -3,7 +3,7 @@ pragma solidity 0.8.20;
 
 interface IEvent {
     function initialize(
-        string calldata _eventIdentifier,
+        string calldata _eventData,
         string calldata name_,
         string calldata symbol_,
         address _eventCreator,

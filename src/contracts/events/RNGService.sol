@@ -11,7 +11,7 @@ import {Errors, Events} from "../shared/Monitoring.sol";
 contract RNGService is VRFV2WrapperConsumerBase, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    // *Hardcoded values*
+    // *Hardcoded values — Chainlink VRF*
     uint32 private constant CALLBACK_GAS_LIMIT = 100_000;
     uint16 private constant REQ_CONFIRMATIONS = 3;
     uint32 private constant REQ_WORDS = 1;

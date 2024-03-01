@@ -12,13 +12,13 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
     RNGService public immutable RNG_SERVICE_;
 
     /// @notice Off-chain source of data
-    string public eventIdentifier;
+    string public eventData;
     address public eventCreator;
     uint256 public saleStart;
     uint256 public saleEnd;
     uint256 public ticketPrice;
 
-    uint256 public ticketId;
+    uint256 public nextTicketId;
     // Consider packing the storage variables in fewer storage slots; by using smaller sizes, DIFFERENT type
 
     /* =============================================== ABSTRACT =============================================== */
@@ -48,7 +48,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
     /// @dev By using `_init()` we're preventing some potential inheritance-chain related
     /// problems in OZ's implementations
     function initialize(
-        string calldata _eventIdentifier,
+        string calldata _eventData,
         string calldata name_,
         string calldata symbol_,
         address _eventCreator,
@@ -59,7 +59,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
         __ERC721_init(name_, symbol_);
         __ReentrancyGuard_init();
 
-        eventIdentifier = _eventIdentifier;
+        eventData = _eventData;
         eventCreator = _eventCreator;
         saleStart = _saleStart;
         saleEnd = _saleEnd;
@@ -68,10 +68,10 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
 
     /// @dev Consider implementing logic for storing on-chain TICKET metadata
     function _buyTicket() internal {
-        _mint(msg.sender, ticketId);
+        _mint(msg.sender, nextTicketId);
         // _setTokenURI(ticketId, "");
-        ticketId++;
-        emit Events.TicketBought(msg.sender, ticketId);
+        emit Events.TicketBought(msg.sender, nextTicketId);
+        nextTicketId++;
     }
 
     function _isActive() internal view returns (bool res) {

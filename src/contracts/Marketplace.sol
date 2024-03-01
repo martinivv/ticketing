@@ -14,7 +14,7 @@ contract Marketplace is Ownable {
 
     EventBeacon public immutable BEACON_;
 
-    EnumerableSet.AddressSet private _deployedTicketProxies;
+    EnumerableSet.AddressSet private _allEvents;
 
     /* ================================================ METHODS =============================================== */
 
@@ -23,7 +23,7 @@ contract Marketplace is Ownable {
     }
 
     function createEvent(
-        string calldata eventIdentifier_,
+        string calldata eventData_,
         string calldata name_,
         string calldata symbol_,
         uint256 saleStart_,
@@ -31,7 +31,7 @@ contract Marketplace is Ownable {
         uint256 ticketPrice_
     ) external {
         if (
-            bytes(eventIdentifier_).length == 0 ||
+            bytes(eventData_).length == 0 ||
             bytes(name_).length == 0 ||
             bytes(symbol_).length == 0 ||
             saleStart_ < block.number ||
@@ -39,23 +39,23 @@ contract Marketplace is Ownable {
             ticketPrice_ == 0
         ) revert Errors.InvalidIO();
 
-        _deployProxy(eventIdentifier_, name_, symbol_, msg.sender, saleStart_, saleEnd_, ticketPrice_);
+        _deployProxy(eventData_, name_, symbol_, msg.sender, saleStart_, saleEnd_, ticketPrice_);
     }
 
     /* ================================================= VIEW ================================================= */
 
     function getAllProxies() public view returns (address[] memory res) {
-        uint256 len = _deployedTicketProxies.length();
+        uint256 len = _allEvents.length();
         res = new address[](len);
         for (uint256 i; i < len; i++) {
-            res[i] = _deployedTicketProxies.at(i);
+            res[i] = _allEvents.at(i);
         }
     }
 
     /* =========================================== INTERNAL&PRIVATE =========================================== */
 
     function _deployProxy(
-        string calldata eventIdentifier_,
+        string calldata eventData_,
         string calldata name_,
         string calldata symbol_,
         address eventCreator_,
@@ -63,9 +63,9 @@ contract Marketplace is Ownable {
         uint256 saleEnd_,
         uint256 ticketPrice_
     ) private {
-        bytes memory data = abi.encodeWithSelector(
+        bytes memory encodedData = abi.encodeWithSelector(
             IEvent.initialize.selector,
-            eventIdentifier_,
+            eventData_,
             name_,
             symbol_,
             eventCreator_,
@@ -73,8 +73,8 @@ contract Marketplace is Ownable {
             saleEnd_,
             ticketPrice_
         );
-        address newProxyAddr = address(new BeaconProxy(address(BEACON_), data));
-        bool ok = _deployedTicketProxies.add(newProxyAddr);
+        address newProxyAddr = address(new BeaconProxy(address(BEACON_), encodedData));
+        bool ok = _allEvents.add(newProxyAddr);
         if (!ok) revert Errors.ProxyAlreadyPresent();
         emit Events.ProxyDeployed(eventCreator_, newProxyAddr);
     }

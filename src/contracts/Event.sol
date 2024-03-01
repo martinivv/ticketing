@@ -26,9 +26,9 @@ contract Event is EventStorage {
 
     /// @notice Applies the rewarding *mechanism*
     function applyRewarding(uint256 _randomNumber) external virtual onlyRNGService {
-        uint256 ticketIdWinner = _randomNumber % ticketId;
+        uint256 ticketIdWinner = _randomNumber % nextTicketId;
         address eventWinner = ownerOf(ticketIdWinner);
-        _mint(eventWinner, ticketId);
+        _mint(eventWinner, nextTicketId);
         emit Events.EventWinner(eventWinner, ticketIdWinner);
     }
 

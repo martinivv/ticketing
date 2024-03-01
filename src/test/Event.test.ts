@@ -21,8 +21,8 @@ describe('Event', () => {
     /* ========================================= STATE&FUNCTIONALITIES ======================================== */
 
     describe('#State-Initialization', () => {
-        it('sets standard event identifier', async function () {
-            expect(await this.proxy.eventIdentifier()).to.equal(this.eventParams[0])
+        it('sets standard event data', async function () {
+            expect(await this.proxy.eventData()).to.equal(this.eventParams[0])
         })
 
         it('sets standard event name', async function () {
@@ -50,7 +50,7 @@ describe('Event', () => {
         })
 
         it('sets the `ticketId` to zero', async function () {
-            expect(!!(await this.proxy.ticketId().value)).to.be.false
+            expect(!!(await this.proxy.nextTicketId().value)).to.be.false
         })
     })
 
@@ -74,11 +74,11 @@ describe('Event', () => {
             })
 
             it('increases accordingly the ticket ID', async function () {
-                expect(await this.proxy.ticketId()).to.be.equal(1n)
+                expect(await this.proxy.nextTicketId()).to.be.equal(1n)
             })
 
             it('emits event on every bought ticket', async function () {
-                await expect(buyTicketTx).to.emit(this.proxy, 'TicketBought')
+                await expect(buyTicketTx).to.emit(this.proxy, 'TicketBought').withArgs(hre.users.userOne.address, 0n)
             })
         })
 
