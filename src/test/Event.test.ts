@@ -1,6 +1,7 @@
 import { MockContract, smock } from '@defi-wonderland/smock'
 import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { mine } from '@nomicfoundation/hardhat-network-helpers'
+import { mine, setBalance } from '@nomicfoundation/hardhat-network-helpers'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { expect } from 'chai'
 import hre from 'hardhat'
 import { Test_getSaleDuration, fixtures, value as ticketPrice } from '../_helpers/shared-helpers'
@@ -95,16 +96,24 @@ describe('Event', () => {
         })
 
         describe('#ApplyRewarding', () => {
-            it('emits event on every reward applying', async function () {
-                const signer = await hre.ethers.getImpersonatedSigner(hre.RNGService.address)
-                await hre.users.deployer.sendTransaction({
-                    to: signer.address,
-                    value: hre.ethers.utils.parseEther('1'),
-                })
-                await expect(await this.proxy.connect(signer).applyRewarding(12)).to.emit(this.proxy, 'EventWinner')
+            let impersonatedSigner: SignerWithAddress, applyRewardingTx: TransactionResponse
+
+            beforeEach(async function () {
+                impersonatedSigner = await hre.ethers.getImpersonatedSigner(hre.RNGService.address)
+                await setBalance(impersonatedSigner.address, hre.ethers.utils.parseEther('10'))
+
+                applyRewardingTx = await this.proxy.connect(impersonatedSigner).applyRewarding(123)
             })
 
-            /* ... */ // The rest of the tests
+            it('mints one additional ticket to the event winner', async function () {
+                expect(await this.proxy.ownerOf(1n)).to.be.equal(hre.users.userOne.address)
+            })
+
+            it('emits event on every reward apply', async function () {
+                await expect(applyRewardingTx)
+                    .to.emit(this.proxy, 'EventWinner')
+                    .withArgs(hre.users.userOne.address, 0n)
+            })
         })
 
         describe('#WithdrawFunds', () => {
@@ -146,7 +155,16 @@ describe('Event', () => {
             await expect(this.proxy.buyTicket()).to.be.revertedWithCustomError(this.proxy, 'InsufficientBuyValue')
         })
 
-        it('reverts on {buyTicket} when the sale period is over', async function () {
+        it("reverts on {buyTicket} if the sale hasn't started", async function () {
+            this.eventParams[3] += 3n
+            this.eventParams[4] += 3n
+            // @ts-ignore
+            await hre.Marketplace.createEvent(...this.eventParams)
+            const proxy = hre.Event.attach((await hre.Marketplace.getAllProxies())[1])
+            await expect(proxy.buyTicket()).to.be.revertedWithCustomError(proxy, 'SaleNotActive')
+        })
+
+        it('reverts on {buyTicket} if the sale period is over', async function () {
             await mine(1)
             await expect(this.proxy.buyTicket()).to.be.revertedWithCustomError(this.proxy, 'SaleNotActive')
         })

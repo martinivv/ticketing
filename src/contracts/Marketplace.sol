@@ -12,12 +12,15 @@ import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol"
 contract Marketplace is Ownable {
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    EventBeacon public BEACON_;
+    EventBeacon public immutable BEACON_;
+
     EnumerableSet.AddressSet private _deployedTicketProxies;
 
     /* ================================================ METHODS =============================================== */
 
-    constructor(address initialOwner_) Ownable(initialOwner_) {}
+    constructor(address _beacon, address initialOwner_) Ownable(initialOwner_) {
+        BEACON_ = EventBeacon(_beacon);
+    }
 
     function createEvent(
         string calldata eventIdentifier_,
@@ -39,20 +42,6 @@ contract Marketplace is Ownable {
         _deployProxy(eventIdentifier_, name_, symbol_, msg.sender, saleStart_, saleEnd_, ticketPrice_);
     }
 
-    /* ================================================= OWNER ================================================ */
-
-    /// @notice Setups the Events structure
-    function setupEvents(address implementation_) external onlyOwner {
-        BEACON_ = new EventBeacon(implementation_, address(this));
-    }
-
-    /// @notice Updates the base implementation
-    function updateImplementation(address new_) external onlyOwner {
-        address prev = BEACON_.implementation();
-        BEACON_.upgradeTo(new_);
-        emit Events.BaseImplementationChanged(prev, new_);
-    }
-
     /* ================================================= VIEW ================================================= */
 
     function getAllProxies() public view returns (address[] memory res) {
@@ -63,7 +52,7 @@ contract Marketplace is Ownable {
         }
     }
 
-    /* ================================================ PRIVATE =============================================== */
+    /* =========================================== INTERNAL&PRIVATE =========================================== */
 
     function _deployProxy(
         string calldata eventIdentifier_,
@@ -73,7 +62,7 @@ contract Marketplace is Ownable {
         uint256 saleStart_,
         uint256 saleEnd_,
         uint256 ticketPrice_
-    ) internal {
+    ) private {
         bytes memory data = abi.encodeWithSelector(
             IEvent.initialize.selector,
             eventIdentifier_,
@@ -87,6 +76,6 @@ contract Marketplace is Ownable {
         address newProxyAddr = address(new BeaconProxy(address(BEACON_), data));
         bool ok = _deployedTicketProxies.add(newProxyAddr);
         if (!ok) revert Errors.ProxyAlreadyPresent();
-        emit Events.ProxyDeployed(msg.sender, newProxyAddr);
+        emit Events.ProxyDeployed(eventCreator_, newProxyAddr);
     }
 }

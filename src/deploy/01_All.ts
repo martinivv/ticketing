@@ -7,16 +7,14 @@ const all: DeployFunction = async function ({ deployments: { log } }) {
 
     const rngServiceAddr = await deployContract('RNGService', { args: [Test_LINK_TOKEN, Test_VRF_WRAPPER] })
     const eventImplAddr = await deployContract('Event', { args: [rngServiceAddr] })
-    const marketplaceAddr = await deployContract('Marketplace', { args: [hre.users.deployer.address] })
-
-    const marketplaceContract = await hre.ethers.getContractAt('Marketplace', marketplaceAddr)
-    await marketplaceContract.setupEvents(eventImplAddr)
+    const eventBeaconAddr = await deployContract('EventBeacon', { args: [eventImplAddr, hre.users.deployer.address] })
+    const marketplaceAddr = await deployContract('Marketplace', { args: [eventBeaconAddr, hre.users.deployer.address] })
 
     // ========== USED IN TESTS/SCRIPTS ==========
-    hre.Marketplace = marketplaceContract
+    hre.Marketplace = await hre.ethers.getContractAt('Marketplace', marketplaceAddr)
     hre.Event = await hre.ethers.getContractAt('Event', eventImplAddr)
     hre.RNGService = await hre.ethers.getContractAt('RNGService', rngServiceAddr)
-    hre.EventBeacon = await hre.ethers.getContractAt('EventBeacon', await marketplaceContract.BEACON_())
+    hre.EventBeacon = await hre.ethers.getContractAt('EventBeacon', eventBeaconAddr)
     // ==========
 
     log('🟢 | The Marketplace has been successfully deployed!\n')

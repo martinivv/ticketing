@@ -37,29 +37,11 @@ describe('Marketplace', () => {
         it('saves the proxy instance', async function () {
             expect(await hre.Marketplace.getAllProxies()).to.not.be.empty
         })
-
-        it('updates the base implementation', async function () {
-            // For the testing purpose — an address with code size > 0
-            await hre.Marketplace.updateImplementation(hre.RNGService.address)
-            expect(await hre.EventBeacon.implementation()).to.equal(hre.RNGService.address)
-        })
     })
 
     /* ================================================ ATTACK ================================================ */
 
     describe('#Attack', () => {
-        it('reverts if a user tries to setup the event structure', async function () {
-            await expect(
-                hre.Marketplace.connect(hre.users.userOne).setupEvents(hre.ethers.constants.AddressZero)
-            ).to.be.revertedWithCustomError(hre.Marketplace, 'OwnableUnauthorizedAccount')
-        })
-
-        it('reverts if a user tries to update the base implementation', async function () {
-            await expect(
-                hre.Marketplace.connect(hre.users.userOne).updateImplementation(hre.ethers.constants.AddressZero)
-            ).to.be.revertedWithCustomError(hre.Marketplace, 'OwnableUnauthorizedAccount')
-        })
-
         it('reverts if a user tries to renounce ownership', async function () {
             await expect(hre.Marketplace.connect(hre.users.userOne).renounceOwnership()).to.be.revertedWithCustomError(
                 hre.Marketplace,

@@ -2,12 +2,13 @@
 pragma solidity 0.8.20;
 
 import {VRFV2WrapperConsumerBase} from "@chainlink/contracts/src/v0.8/vrf/VRFV2WrapperConsumerBase.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Errors, Events} from "../shared/Monitoring.sol";
 
 /// @notice @title RNGService provides independent Random Number Generation service
-contract RNGService is VRFV2WrapperConsumerBase {
+contract RNGService is VRFV2WrapperConsumerBase, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     // *Hardcoded values*
@@ -41,8 +42,9 @@ contract RNGService is VRFV2WrapperConsumerBase {
         IERC20(linkTokenAddr).safeTransferFrom(msg.sender, address(this), fee);
     }
 
+    /// @dev Re-entering may cause inaccuracies
     /// @dev ::suggestion Consider implementing a more robust RNG process — for example, by using different third-party oracle providers
-    function requestRandomNumber(string calldata _callbackSignature) external {
+    function requestRandomNumber(string calldata _callbackSignature) external nonReentrant {
         uint256 requestId = requestRandomness(CALLBACK_GAS_LIMIT, REQ_CONFIRMATIONS, REQ_WORDS);
         _requests[requestId] = msg.sender;
         _callbacks[requestId] = _callbackSignature;

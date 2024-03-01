@@ -18,7 +18,7 @@ contract Event is EventStorage {
     }
 
     /// @notice After the end of the event, makes a request to `RNGService`/DON
-    function requestEventWinner() external virtual override afterActiveSale nonReentrant {
+    function requestEventWinner() external virtual override afterActiveSale {
         RNG_SERVICE_.fundVrfConsumer();
         RNG_SERVICE_.requestRandomNumber("applyRewarding(uint256)");
         emit Events.EventWinnerRequested();
@@ -29,14 +29,14 @@ contract Event is EventStorage {
         uint256 ticketIdWinner = _randomNumber % ticketId;
         address eventWinner = ownerOf(ticketIdWinner);
         _mint(eventWinner, ticketId);
-        emit Events.EventWinner(eventWinner, ticketId);
+        emit Events.EventWinner(eventWinner, ticketIdWinner);
     }
 
     /* ========================================== EVENT CREATOR ========================================= */
 
     /// @dev The intend of using assembly here is to skip the annoying memory copy on `.call()`
     /// @dev ::suggestion Allowed period of executing?
-    function withdrawFunds() external payable virtual {
+    function withdrawFunds() external payable virtual nonReentrant {
         if (msg.sender != eventCreator) revert Errors.MustBeEventCreator();
         bytes4 errorSelector = Errors.WithdrawFailed.selector;
         uint256 withdrawValue;
