@@ -34,7 +34,7 @@ describe('Marketplace', () => {
             await expect(createEventTx).to.emit(hre.Marketplace, 'ProxyDeployed')
         })
 
-        it('saves the proxy instance', async function () {
+        it('saves the event/proxy instance', async function () {
             expect(await hre.Marketplace.getAllEvents()).to.not.be.empty
         })
     })
