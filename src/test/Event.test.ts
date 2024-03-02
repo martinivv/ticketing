@@ -21,6 +21,10 @@ describe('Event', () => {
     /* ========================================= STATE&FUNCTIONALITIES ======================================== */
 
     describe('#State-Initialization', () => {
+        it('sets standard RNG', async function () {
+            expect(await this.proxy.RNG_SERVICE_()).to.equal(hre.RNGService.address)
+        })
+
         it('sets standard event data', async function () {
             expect(await this.proxy.eventData()).to.equal(this.eventParams[0])
         })
@@ -37,7 +41,7 @@ describe('Event', () => {
             expect(await this.proxy.eventCreator()).to.equal(hre.users.deployer.address)
         })
 
-        it('sets standart sale start', async function () {
+        it('sets standard sale start', async function () {
             expect(await this.proxy.saleStart()).to.equal(this.eventParams[3])
         })
 
@@ -109,7 +113,7 @@ describe('Event', () => {
                 expect(await this.proxy.ownerOf(1n)).to.be.equal(hre.users.userOne.address)
             })
 
-            it('emits event on every reward apply', async function () {
+            it('applies correct ticket ID winner, event winner | emits event on every reward apply', async function () {
                 await expect(applyRewardingTx)
                     .to.emit(this.proxy, 'EventWinner')
                     .withArgs(hre.users.userOne.address, 0n)
