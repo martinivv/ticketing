@@ -76,11 +76,10 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
 
     /// @notice Checks if the event is currently active
     function _isActive() internal view returns (bool out) {
-        uint256 currentBlock = block.number;
-        out = currentBlock >= saleStart && currentBlock <= saleEnd;
+        out = block.number >= saleStart && block.number <= saleEnd;
     }
 
     /// @dev This empty reserved space is put in place to allow future versions to add new
     /// variables without shifting down storage in the inheritance chain
-    uint256[45] private __gap;
+    uint256[44] private __gap;
 }
