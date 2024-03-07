@@ -15,11 +15,16 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
     string public eventData;
     /// @notice 👇 are variables related to the current event
     /// @dev ::suggestion Consider packing the storage variables in fewer storage slots; by using smaller sizes, DIFFERENT type
+    /// @dev ::suggestion ERC1967 type storage slots?
     address public eventCreator;
     uint256 public saleStart;
     uint256 public saleEnd;
     uint256 public ticketPrice;
     uint256 public nextTicketId;
+
+    /// @dev This empty reserved space is put in place to allow future versions to add new
+    /// variables without shifting down storage in the inheritance chain
+    uint256[44] private __gap;
 
     /* =============================================== ABSTRACT =============================================== */
 
@@ -78,8 +83,4 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
     function _isActive() internal view returns (bool out) {
         out = block.number >= saleStart && block.number <= saleEnd;
     }
-
-    /// @dev This empty reserved space is put in place to allow future versions to add new
-    /// variables without shifting down storage in the inheritance chain
-    uint256[44] private __gap;
 }
