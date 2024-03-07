@@ -4,7 +4,7 @@ import { mine, setBalance } from '@nomicfoundation/hardhat-network-helpers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { expect } from 'chai'
 import hre from 'hardhat'
-import { Test_getSaleDuration, fixtures, value as ticketPrice } from '../_helpers/shared-helpers'
+import { Test_getSaleDuration, fixtures, Test_value as ticketPrice } from '../_helpers/shared-helpers'
 import { Event, Event__factory, RNGService } from '../_helpers/typechain'
 
 describe('Event', () => {

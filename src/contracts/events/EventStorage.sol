@@ -69,7 +69,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
     /// @dev ::suggestion Consider implementing logic for storing on-chain ticket metadata
     function _buyTicket() internal {
         _mint(msg.sender, nextTicketId);
-        // _setTokenURI(ticketId, "");
+        // _setTokenURI(nextTicketId, "{...}");
         emit Events.TicketBought(msg.sender, nextTicketId);
         nextTicketId++;
     }

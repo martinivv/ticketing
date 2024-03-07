@@ -1,7 +1,7 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { expect } from 'chai'
 import hre from 'hardhat'
-import { fixtures, Test_getSaleDuration, value as ticketPrice } from '../_helpers/shared-helpers'
+import { fixtures, Test_getSaleDuration, Test_value as ticketPrice } from '../_helpers/shared-helpers'
 
 describe('Marketplace', () => {
     fixtures(['all'])

@@ -1,5 +1,5 @@
 import hre from 'hardhat'
-import { Test_getSaleDuration, value } from './_helpers/shared-helpers'
+import { Test_getSaleDuration, Test_value as value } from './_helpers/shared-helpers'
 import { Event } from './_helpers/typechain'
 
 async function script() {

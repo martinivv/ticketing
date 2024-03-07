@@ -2,7 +2,7 @@ import { FakeContract, smock } from '@defi-wonderland/smock'
 import { expect } from 'chai'
 import hre from 'hardhat'
 import linkTokenInterface from '../../build/artifacts/@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol/LinkTokenInterface.json'
-import { Test_LINK_TOKEN, Test_VRF_WRAPPER, fixtures, value } from '../_helpers/shared-helpers'
+import { Test_LINK_TOKEN, Test_VRF_WRAPPER, fixtures, Test_value as value } from '../_helpers/shared-helpers'
 import { LinkTokenInterface, RNGService__factory } from '../_helpers/typechain'
 
 describe('RNGService', () => {

@@ -1,21 +1,31 @@
 import hre from 'hardhat'
 import { DeployFunction } from 'hardhat-deploy/dist/types'
 import { Test_LINK_TOKEN, Test_VRF_WRAPPER, deployContract } from '../_helpers/shared-helpers'
+import { Event, EventBeacon, Marketplace, RNGService } from '../_helpers/typechain'
 
 const all: DeployFunction = async function ({ deployments: { log } }) {
-    log('\n#1')
+    log('\n#01')
 
-    const rngServiceAddr = await deployContract('RNGService', { args: [Test_LINK_TOKEN, Test_VRF_WRAPPER] })
-    const eventImplAddr = await deployContract('Event', { args: [rngServiceAddr] })
-    const eventBeaconAddr = await deployContract('EventBeacon', { args: [eventImplAddr, hre.users.deployer.address] })
-    const marketplaceAddr = await deployContract('Marketplace', { args: [eventBeaconAddr, hre.users.deployer.address] })
+    const rngDeploy = await deployContract('RNGService', { args: [Test_LINK_TOKEN, Test_VRF_WRAPPER] })
+    const eventDeploy = await deployContract('Event', { args: [rngDeploy.address] })
+    const eventBeaconDeploy = await deployContract('EventBeacon', {
+        args: [eventDeploy.address, hre.users.deployer.address],
+    })
+    await deployContract('Marketplace', { args: [eventBeaconDeploy.address, hre.users.deployer.address] })
 
-    // ========== USED IN TESTS/SCRIPTS ==========
-    hre.Marketplace = await hre.ethers.getContractAt('Marketplace', marketplaceAddr)
-    hre.Event = await hre.ethers.getContractAt('Event', eventImplAddr)
-    hre.RNGService = await hre.ethers.getContractAt('RNGService', rngServiceAddr)
-    hre.EventBeacon = await hre.ethers.getContractAt('EventBeacon', eventBeaconAddr)
-    // ==========
+    // ================= USED IN TESTS/SCRIPTS =================
+    const [Marketplace, Event, EventBeacon, RNGService] = await Promise.all([
+        hre.ethers.getContract('Marketplace'),
+        hre.ethers.getContract('Event'),
+        hre.ethers.getContract('EventBeacon'),
+        hre.ethers.getContract('RNGService'),
+    ])
+
+    hre.Marketplace = Marketplace as Marketplace
+    hre.Event = Event as Event
+    hre.EventBeacon = EventBeacon as EventBeacon
+    hre.RNGService = RNGService as RNGService
+    // =================
 
     log('🟢 | The Marketplace has been successfully deployed!\n')
 }

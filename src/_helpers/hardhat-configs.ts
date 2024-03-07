@@ -5,7 +5,7 @@ import { Event, EventBeacon, Marketplace, RNGService } from './typechain'
 
 /* ============================================= AUGMENTATION ============================================= */
 
-// For an easier testing
+// Used in tests
 extendEnvironment(async function (hre) {
     hre.users = await hre.ethers.getNamedSigners()
 })
