@@ -3,8 +3,8 @@ import hre from 'hardhat'
 /* ============================================== DEPLOYMENT ============================================== */
 
 export const deployContract = async function (contractName: string, options_ = {}) {
-    const [deployer] = await hre.ethers.getSigners()
-    const options = { from: deployer.address, ...options_ }
+    const deployerAddr = hre.users ? hre.users.deployer.address : (await hre.ethers.getNamedSigners()).deployer.address
+    const options = { from: deployerAddr, ...options_ }
     return await hre.deployments.deploy(contractName, options)
 }
 
