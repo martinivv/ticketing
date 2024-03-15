@@ -8,11 +8,11 @@ import { LinkTokenInterface, RNGService__factory } from '../_helpers/typechain'
 describe('RNGService', () => {
     fixtures(['all'])
 
-    /* ============================================ INITIALIZATION ============================================ */
+    /* ================================================= STATE ================================================ */
 
     describe('#State-Initialization', () => {
         it('sets standard LINK token address', async function () {
-            expect(await hre.RNGService.linkTokenAddr()).to.be.equal(Test_LINK_TOKEN)
+            expect(await hre.RNGService.LINK_TOKEN_()).to.be.equal(Test_LINK_TOKEN)
         })
     })
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
 import {ERC721URIStorageUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
@@ -7,19 +7,19 @@ import {IEvent} from "./IEvent.sol";
 import {RNGService} from "./RNGService.sol";
 import {Errors, Events} from "../shared/Monitoring.sol";
 
-/// @dev @title EventStorage provides the storage layout saved on the proxy with some abstract-controlling methods
+/// @title EventStorage provides the storage layout saved on the proxy with some abstract-controlling methods
 abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUpgradeable, IEvent {
     RNGService public immutable RNG_SERVICE_;
 
-    /// @notice Source of the off-chain stored data (e.g., IPFS)
+    /* ::suggestion Consider packing the storage variables in fewer storage slots; by using smaller sizes, different type */
+
+    /// @notice URI to the off-chain stored data (IPFS)
     string public eventData;
-    /// @notice 👇 are variables related to the current event
-    /// @dev ::suggestion Consider packing the storage variables in fewer storage slots; by using smaller sizes, DIFFERENT type
-    /// @dev ::suggestion ERC1967 type storage slots?
-    address public eventCreator;
     uint256 public saleStart;
     uint256 public saleEnd;
     uint256 public ticketPrice;
+    address public eventCreator;
+
     uint256 public nextTicketId;
 
     /// @dev This empty reserved space is put in place to allow future versions to add new
@@ -38,11 +38,6 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
         _;
     }
 
-    modifier onlyRNGService() {
-        if (msg.sender != address(RNG_SERVICE_)) revert Errors.NotRNGService();
-        _;
-    }
-
     /// @dev Setting immutable variables in an upgradeable contract is safe and can lead to significant gas savings
     constructor(address payable _rngService) {
         RNG_SERVICE_ = RNGService(_rngService);
@@ -50,7 +45,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
 
     /// @notice Setups the event
     /// @dev `initializer` modifier — prevents the proxy state to be reinitialized
-    /// @dev By using `_init()` we're preventing some potential inheritance-chain related
+    /// @dev By using `_init()`, we're preventing some potential inheritance-chain-related
     /// problems in OZ's implementations
     function initialize(
         string calldata _eventData,
@@ -60,7 +55,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
         uint256 _saleStart,
         uint256 _saleEnd,
         uint256 _ticketPrice
-    ) external override initializer {
+    ) external virtual override initializer {
         __ERC721_init(name_, symbol_);
         __ReentrancyGuard_init();
 
@@ -72,9 +67,8 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
     }
 
     /// @dev ::suggestion Consider implementing logic for storing on-chain ticket metadata
-    function _buyTicket() internal {
-        _mint(msg.sender, nextTicketId);
-        // _setTokenURI(nextTicketId, "{...}");
+    function _buyTicket() internal virtual {
+        _safeMint(msg.sender, nextTicketId);
         emit Events.TicketBought(msg.sender, nextTicketId);
         nextTicketId++;
     }

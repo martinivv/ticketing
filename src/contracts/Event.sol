@@ -1,10 +1,10 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
 import {EventStorage} from "./events/EventStorage.sol";
 import {Errors, Events} from "./shared/Monitoring.sol";
 
-/// @notice @title Event represents every unique UPGRADEABLE event as part of the NFT marketplace
+/// @title Event represents every unique UPGRADEABLE event as part of the NFT marketplace
 contract Event is EventStorage {
     /// @dev `_disableInitializers()` — prevents the proxied state of being reinitialized
     constructor(address payable _rngService) EventStorage(_rngService) {
@@ -12,43 +12,42 @@ contract Event is EventStorage {
     }
 
     /// @notice Buying functionality on a fixed sale period
-    /// @dev Including an option for storing on-chain TICKET metadata
-    function buyTicket() external payable virtual override onActiveSale {
+    /// @dev Using `nonReentrant` to prevent the re-entrancy attack vector of `_safeMint`
+    function buyTicket() external payable virtual onActiveSale nonReentrant {
         if (msg.value < ticketPrice) revert Errors.InsufficientBuyValue();
         _buyTicket();
     }
 
     /// @notice After the end of the sale period, makes a request for
     /// a fair and verifiable random number
-    function requestEventWinner() external virtual override afterActiveSale {
+    function requestEventWinner() external virtual afterActiveSale {
         RNG_SERVICE_.fundVrfConsumer();
         RNG_SERVICE_.requestRandomNumber("applyRewarding(uint256)");
         emit Events.EventWinnerRequested();
     }
 
     /// @notice Applies the rewarding *mechanism*
-    function applyRewarding(uint256 _randomNumber) external virtual onlyRNGService {
+    function applyRewarding(uint256 _randomNumber) external virtual {
+        if (msg.sender != address(RNG_SERVICE_)) revert Errors.NotRNGService();
         uint256 ticketIdWinner = _randomNumber % nextTicketId;
         address eventWinner = ownerOf(ticketIdWinner);
-        _mint(eventWinner, nextTicketId);
+        _safeMint(eventWinner, nextTicketId);
         emit Events.EventWinner(eventWinner, ticketIdWinner);
     }
 
     /* ========================================== EVENT CREATOR ========================================= */
 
-    /// @notice A method that the event creator can use to withdraw the collected funds
-    /// @dev The intend of using assembly here is to skip the annoying memory copy on `.call()`
+    /// @notice Enables event creators to withdraw the collected funds
+    /// @dev Using assembly here avoids memory copying on `.call()`
     /// @dev ::suggestion Allowed period of executing?
     function withdrawFunds() external payable virtual nonReentrant {
         if (msg.sender != eventCreator) revert Errors.MustBeEventCreator();
-        bytes4 errorSelector = Errors.WithdrawFailed.selector;
-        uint256 withdrawValue;
+        uint256 withdrawValue = address(this).balance;
         assembly {
-            let to := sload(eventCreator.slot)
-            withdrawValue := selfbalance()
-            let s := call(gas(), to, withdrawValue, 0, 0, 0, 0)
+            let s := call(gas(), sload(eventCreator.slot), withdrawValue, 0, 0, 0, 0)
             if iszero(s) {
-                mstore(0, errorSelector)
+                // `WithdrawFailed()`'s selector
+                mstore(0, 0x750b219c)
                 revert(0, 4)
             }
         }

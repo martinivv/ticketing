@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
 interface IEvent {
@@ -11,10 +11,4 @@ interface IEvent {
         uint256 _saleEnd,
         uint256 _ticketPrice
     ) external;
-
-    function buyTicket() external payable;
-
-    function requestEventWinner() external;
-
-    function withdrawFunds() external payable;
 }

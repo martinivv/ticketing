@@ -5,9 +5,9 @@ import { fixtures } from '../_helpers/shared-helpers'
 describe('EventBeacon', () => {
     fixtures(['all'])
 
-    /* ============================================ INITIALIZATION ============================================ */
+    /* ================================================= STATE ================================================ */
 
-    describe('#State', () => {
+    describe('#State-Initialization', () => {
         it('sets standard implementation', async function () {
             expect(await hre.EventBeacon.implementation()).to.be.equal(hre.Event.address)
         })

@@ -3,7 +3,7 @@
   "name": "nft-tickets-marketplace",
   "description": "Encorp task",
   "version": "1.0.0",
-  "license": "Apache-2.0",
+  "license": "UNLICENSED",
   "scripts": {
     "script": "hardhat run ./src/script.ts",
     "test": "hardhat test",

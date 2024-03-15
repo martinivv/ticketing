@@ -14,13 +14,21 @@ import './src/_helpers/hardhat-configs'
 /* ================================================ CONFIGS =============================================== */
 
 export default <HardhatUserConfig>{
-    solidity: '0.8.20',
     paths: {
         sources: './src/contracts',
         deploy: './src/deploy',
         tests: './src/test',
         artifacts: './build/artifacts',
         cache: './build/cache',
+    },
+    solidity: {
+        version: '0.8.20',
+        settings: {
+            optimizer: {
+                enabled: true,
+                runs: 1300,
+            },
+        },
     },
     typechain: {
         target: 'ethers-v5',

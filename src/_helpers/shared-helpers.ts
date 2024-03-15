@@ -8,7 +8,7 @@ export const deployContract = async function (contractName: string, options_ = {
     return await hre.deployments.deploy(contractName, options)
 }
 
-/* ============================================= SCRIPTS&TESTS ============================================ */
+/* ================================================= TESTS ================================================ */
 
 export const Test_LINK_TOKEN = '0x514910771AF9Ca656af840dff83E8264EcF986CA'
 export const Test_VRF_WRAPPER = '0x5A861794B927983406fCE1D062e00b9368d97Df6'

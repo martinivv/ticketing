@@ -6,7 +6,7 @@ import { fixtures, Test_getSaleDuration, Test_value as ticketPrice } from '../_h
 describe('Marketplace', () => {
     fixtures(['all'])
 
-    /* ============================================ INITIALIZATION ============================================ */
+    /* ================================================= STATE ================================================ */
 
     describe('#State-Initialization', () => {
         it('sets standard initial owner', async function () {
@@ -31,7 +31,7 @@ describe('Marketplace', () => {
         })
 
         it('emits an event on every added event', async function () {
-            await expect(createEventTx).to.emit(hre.Marketplace, 'ProxyDeployed')
+            await expect(createEventTx).to.emit(hre.Marketplace, 'EventCreated')
         })
 
         it('saves the event/proxy instance', async function () {

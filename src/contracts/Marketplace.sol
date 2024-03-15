@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.20;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -7,14 +7,14 @@ import {Errors, Events} from "./shared/Monitoring.sol";
 import {IEvent} from "./events/IEvent.sol";
 import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 
-/// @notice @title Marketplace provides an administrative panel for the marketplace
+/// @title Marketplace provides an administrative panel for the marketplace
 contract Marketplace is Ownable {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     /// @notice The address of the beacon, managing the proxies
     address public immutable beaconAddr;
 
-    /// @notice Extensive type structure and all deployed events
+    /// @notice All deployed events in an extensive type structure
     EnumerableSet.AddressSet private _allEvents;
 
     /* ================================================ METHODS =============================================== */
@@ -23,10 +23,10 @@ contract Marketplace is Ownable {
         beaconAddr = _beacon;
     }
 
-    /// @notice Used for creating new events
-    /// @param eventData_ URI pointing to off-chain event data
-    /// @param name_ The name of the NFT ticket
-    /// @param symbol_ The symbol of the NFT ticket
+    /// @notice Creates new events
+    /// @param eventData_ The URI pointing to off-chain event data
+    /// @param name_ The name of the NFT tickets for sale
+    /// @param symbol_ The symbol of the NFT tickets for sale
     /// @param saleStart_ The block number at which the ticket sale period starts
     /// @param saleEnd_ The block number at which the ticket sale period ends
     /// @param ticketPrice_ Specifies the ticket price
@@ -47,7 +47,8 @@ contract Marketplace is Ownable {
             ticketPrice_ == 0
         ) revert Errors.InvalidIO();
 
-        _deployProxy(eventData_, name_, symbol_, msg.sender, saleStart_, saleEnd_, ticketPrice_);
+        address newProxyAddr = _deployProxy(eventData_, name_, symbol_, msg.sender, saleStart_, saleEnd_, ticketPrice_);
+        emit Events.EventCreated(msg.sender, newProxyAddr);
     }
 
     /* ================================================= VIEW ================================================= */
@@ -72,7 +73,7 @@ contract Marketplace is Ownable {
         uint256 saleStart_,
         uint256 saleEnd_,
         uint256 ticketPrice_
-    ) private {
+    ) private returns (address newProxyAddr) {
         bytes memory encodedData = abi.encodeWithSelector(
             IEvent.initialize.selector,
             eventData_,
@@ -83,9 +84,8 @@ contract Marketplace is Ownable {
             saleEnd_,
             ticketPrice_
         );
-        address newProxyAddr = address(new BeaconProxy(beaconAddr, encodedData));
+        newProxyAddr = address(new BeaconProxy(beaconAddr, encodedData));
         bool ok = _allEvents.add(newProxyAddr);
         if (!ok) revert Errors.ProxyAlreadyPresent();
-        emit Events.ProxyDeployed(eventCreator_, newProxyAddr);
     }
 }

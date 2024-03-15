@@ -18,7 +18,7 @@ describe('Event', () => {
         this.proxy = hre.Event.attach((await hre.Marketplace.getAllEvents())[0])
     })
 
-    /* ========================================= STATE&FUNCTIONALITIES ======================================== */
+    /* ================================================= STATE ================================================ */
 
     describe('#State-Initialization', () => {
         it('sets standard RNG', async function () {
@@ -57,6 +57,8 @@ describe('Event', () => {
             expect(!!(await this.proxy.nextTicketId().value)).to.be.false
         })
     })
+
+    /* ============================================ FUNCTIONALITIES =========================================== */
 
     describe('#Functionalities', () => {
         let buyTicketTx: TransactionResponse

@@ -1,7 +1,7 @@
-# Folders
+# Directories
 build/
 node_modules/
-src/_helpers/typechain
+src/_helpers/typechain/
 
 # Files
 # {...}
