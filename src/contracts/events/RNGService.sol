@@ -16,6 +16,7 @@ contract RNGService is VRFV2WrapperConsumerBase, ReentrancyGuard {
 
     // ======== Chainlink VRF ========
     uint32 private constant CALLBACK_GAS_LIMIT = 100_000;
+    /// @dev The value should be high enough to avoid reorg attacks
     uint16 private constant REQ_CONFIRMATIONS = 3;
     uint32 private constant REQ_WORDS = 1;
     IERC20 public immutable LINK_TOKEN_;
@@ -45,10 +46,9 @@ contract RNGService is VRFV2WrapperConsumerBase, ReentrancyGuard {
     }
 
     /// @notice Makes a Chainlink VRF request
-    /// @dev Re-entering may cause inaccuracies
     /// @dev ::suggestion Consider implementing a more robust RNG process —
     /// e.g., by using different third-party oracle providers
-    function requestRandomNumber(string calldata _callbackSignature) external nonReentrant {
+    function requestRandomNumber(string calldata _callbackSignature) external {
         uint256 requestId = requestRandomness(CALLBACK_GAS_LIMIT, REQ_CONFIRMATIONS, REQ_WORDS);
         _requests[requestId] = msg.sender;
         _callbacks[requestId] = _callbackSignature;

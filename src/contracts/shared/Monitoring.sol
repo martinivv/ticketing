@@ -23,4 +23,5 @@ library Errors {
     error RandomnessNotApplied();
     error MustBeEventCreator();
     error WithdrawFailed();
+    error WinnerAlreadyChosen();
 }

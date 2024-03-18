@@ -20,6 +20,7 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
     uint256 public ticketPrice;
     address public eventCreator;
 
+    bool isWinnerChosen;
     uint256 public nextTicketId;
 
     /// @dev This empty reserved space is put in place to allow future versions to add new
@@ -66,8 +67,9 @@ abstract contract EventStorage is ERC721URIStorageUpgradeable, ReentrancyGuardUp
         ticketPrice = _ticketPrice;
     }
 
+    /// @dev Prevents the re-entrancy attack vector of `_safeMint`
     /// @dev ::suggestion Consider implementing logic for storing on-chain ticket metadata
-    function _buyTicket() internal virtual {
+    function _buyTicket() internal virtual nonReentrant {
         _safeMint(msg.sender, nextTicketId);
         emit Events.TicketBought(msg.sender, nextTicketId);
         nextTicketId++;

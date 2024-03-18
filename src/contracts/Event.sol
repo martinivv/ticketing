@@ -12,8 +12,7 @@ contract Event is EventStorage {
     }
 
     /// @notice Buying functionality on a fixed sale period
-    /// @dev Using `nonReentrant` to prevent the re-entrancy attack vector of `_safeMint`
-    function buyTicket() external payable virtual onActiveSale nonReentrant {
+    function buyTicket() external payable virtual onActiveSale {
         if (msg.value < ticketPrice) revert Errors.InsufficientBuyValue();
         _buyTicket();
     }
@@ -21,6 +20,7 @@ contract Event is EventStorage {
     /// @notice After the end of the sale period, makes a request for
     /// a fair and verifiable random number
     function requestEventWinner() external virtual afterActiveSale {
+        if (isWinnerChosen) revert Errors.WinnerAlreadyChosen();
         RNG_SERVICE_.fundVrfConsumer();
         RNG_SERVICE_.requestRandomNumber("applyRewarding(uint256)");
         emit Events.EventWinnerRequested();
@@ -32,6 +32,7 @@ contract Event is EventStorage {
         uint256 ticketIdWinner = _randomNumber % nextTicketId;
         address eventWinner = ownerOf(ticketIdWinner);
         _safeMint(eventWinner, nextTicketId);
+        isWinnerChosen = true;
         emit Events.EventWinner(eventWinner, ticketIdWinner);
     }
 
