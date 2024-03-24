@@ -2,13 +2,12 @@
 pragma solidity 0.8.20;
 
 import {VRFV2WrapperConsumerBase} from "@chainlink/contracts/src/v0.8/vrf/VRFV2WrapperConsumerBase.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Errors} from "../shared/Monitoring.sol";
 
 /// @title RNGService provides independent Random Number Generation service
-contract RNGService is VRFV2WrapperConsumerBase, ReentrancyGuard {
+contract RNGService is VRFV2WrapperConsumerBase {
     using SafeERC20 for IERC20;
 
     /* ::suggestion Place for state controllers, parameters, which can then be used somewhere else.
