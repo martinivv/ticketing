@@ -1,4 +1,4 @@
-## QUICK Start
+## Quick Start
 
 1. **`yarn`**
 2. **`yarn script`**
